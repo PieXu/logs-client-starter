@@ -28,12 +28,13 @@ public class AuditLogConfiguration {
 	public AuditLogAspect auditLogAspect() {
 		AuditLogAspect auditLogAspect = null;
 		try {
-			LogClient.connect();
-			auditLogAspect = new AuditLogAspect();
+			if(LogClient.connect()){
+				auditLogAspect = new AuditLogAspect();
+				logger.info("启用审计日志初始化完成......");
+			}
 		} catch (Exception e) {
 			logger.info("启用审计日志始化异常：{}",e.getMessage());
 		}
-		logger.info("启用审计日志初始化完成......");
 		return auditLogAspect;
 	}
 

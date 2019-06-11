@@ -29,6 +29,7 @@ public class AuditLog implements Serializable{
 	private String result;// 请求结果
 	private AuditMonitor.AuditType auditType;//类型
 	private String remark;//操作的结果
+	private String authCode;//授权认证代码
 
 	public String getId() {
 		return id;
@@ -141,6 +142,15 @@ public class AuditLog implements Serializable{
 
 	public void setAuditType(AuditMonitor.AuditType auditType) {
 		this.auditType = auditType;
+	}
+
+
+	public String getAuthCode() {
+		return authCode;
+	}
+
+	public void setAuthCode(String authCode) {
+		this.authCode = authCode;
 	}
 
 

@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.alibaba.fastjson.JSON;
 import com.easysoft.logs.annotation.AuditMonitor;
 import com.easysoft.logs.model.AuditLog;
 import com.easysoft.logs.model.AuditLog.AuditLogResult;
@@ -69,7 +68,7 @@ public class AuditLogAspect {
 				logger.info("用户未登录访问");
 				auditLog.setOperator("佚名");
 			}
-			String reqType = request.getMethod()+"()";
+			String reqType = request.getMethod();
 			auditLog.setReqType(reqType);
 			String reqClass = joinPoint.getSignature().getDeclaringTypeName();
 			auditLog.setReqClass(reqClass);
@@ -102,7 +101,7 @@ public class AuditLogAspect {
 			logger.error("操作日志拦截异常{}",e.getMessage());
 		}
 		//写日志到服务器端
-		LogClient.sendLogMsg(JSON.toJSONString(auditLog));
+		LogClient.sendLogMsg(auditLog);
         return result;
     }
 }

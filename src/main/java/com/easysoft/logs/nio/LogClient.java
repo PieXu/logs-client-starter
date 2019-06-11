@@ -1,9 +1,13 @@
 package com.easysoft.logs.nio;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSON;
+import com.easysoft.logs.model.AuditLog;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -32,6 +36,8 @@ public class LogClient {
 	
 	private static String host;
 	
+	private static String authcode;
+	
 	@Value("${easysoft.log.client.serverPort}")
 	public void setPort(int port) {
 		LogClient.port = port;
@@ -39,6 +45,11 @@ public class LogClient {
 	@Value("${easysoft.log.client.serverHost}")
 	public void setHost(String host) {
 		LogClient.host = host;
+	}
+	
+	@Value("${easysoft.log.client.authcode}")
+	public void setAuthcode(String authcode) {
+		LogClient.authcode = authcode;
 	}
 
 	private static Channel channel;
@@ -52,6 +63,11 @@ public class LogClient {
 	 * @throws Exception
 	 */
 	public static boolean connect() {
+		
+		if(StringUtils.isEmpty(authcode)){
+			logger.error("连接日志服务器[{}:{}]位置设置应用授权CODE,请申请并设置 [{}] 属性",host,port,"easysoft.log.client.authcode");
+			return false;
+		}
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
 			Bootstrap b = new Bootstrap();
@@ -82,14 +98,12 @@ public class LogClient {
 	 * @param channel
 	 * @param msg
 	 */
-	public static void sendLogMsg(String msg) {
+	public static void sendLogMsg(AuditLog log) {
 		if (null == channel || !channel.isActive()) {
-			if(connect()){
-				channel.writeAndFlush(msg);
-			}
-		}else{
-			channel.writeAndFlush(msg);
+			connect();
 		}
+		log.setAuthCode(authcode);
+		channel.writeAndFlush(JSON.toJSONString(log));
 	}
 
 }
